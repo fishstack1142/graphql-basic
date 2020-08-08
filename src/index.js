@@ -10,11 +10,11 @@ const PORT = 4444;
 
 const createServer = async () => {
   try {
-
     await mongoose.connect(`mongodb+srv://${DB_USER}:${DB_PASSWORD}@graphql-basic.pmnob.gcp.mongodb.net/${DB_NAME}?retryWrites=true&w=majority`,
-    { useUnifiedTopology: true })
+    // { useUnifiedTopology: true }
+    )
   
-    const app = express()
+    const app = express();
   
     server.applyMiddleware({ app });
     
