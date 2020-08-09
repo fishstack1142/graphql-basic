@@ -9,7 +9,10 @@
     type Mutation {
         signup(name: String!, email: String!, password: String!): User
         createProduct(description: String!, price: Float!, imageUrl: String!) : Product!
+        updateProduct(id: ID!, description: String, price: Float, imageUrl: String) : Product!
         addToCart(id: ID!): CartItem!
+        deleteCart(id: ID!): CartItem!
+
     }
 
     scalar Date

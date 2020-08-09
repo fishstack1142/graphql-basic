@@ -24,6 +24,36 @@ const Mutation =  {
 
         return User.create({...args, email, password});
     },
+    updateProduct: async (parent, args, context, info) => {
+        const {id, description, price, imageUrl} = args
+
+        //Check if user logged in
+
+        //Find product in database
+        const product = await Product.findById(id)
+
+        //Check if user is the owner of the product
+        const userId = "5f2e440e61ee703cd9261483"
+
+        if (userId !== product.user.toString()) {
+            throw new Error('You are not authorized.')
+        }
+
+        //From updated information
+        const updateInfo = {
+            description: !!description ? description : product.description,
+            price: !!price ? price : product.price,
+            imageUrl: !!imageUrl ? imageUrl : product.imageUrl
+        }
+
+        //Update product in database
+        await Product.findByIdAndUpdate(id, updateInfo)
+
+        // Find the updated product
+        const updatedProduct = await Product.findById(id).populate({ path: 'user' })
+
+        return updatedProduct
+    },
     createProduct: async (parent, args, context, info) => {
         const userId = '5f2e440e61ee703cd9261483'
 
@@ -101,6 +131,32 @@ const Mutation =  {
         } catch (error) {
             console.log(error)
         }
+    },
+    deleteCart: async (parent, args, context, info) => {
+
+        const { id } = args
+
+        //FInd cart from given id
+        const cart = await CartItem .findById(id)
+
+        //check if user logged in
+
+        const userId = "5f2e6bed711bcd44433a2ec9"
+
+        const user = await User.findById(userId)
+
+        //Check owner ship of the cart
+        if (cart.user.toString() !== userId) {
+            throw new Error('Not authorized.')
+        }
+
+        const deletedCart = await CartItem.findOneAndRemove(id)
+
+        const updatedUserCarts = user.carts.filter(cartId => cartId.toString() !== deletedCart.id.toString())
+
+        await User.findByIdAndUpdate(userId, { carts: updatedUserCarts })
+
+        return deletedCart
     }
 }
 
