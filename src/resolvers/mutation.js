@@ -24,16 +24,17 @@ const Mutation =  {
 
         return User.create({...args, email, password});
     },
-    updateProduct: async (parent, args, context, info) => {
+    updateProduct: async (parent, args, {userId}, info) => {
         const {id, description, price, imageUrl} = args
 
         //Check if user logged in
+        if(!userId) throw new Error('Please log in.')
 
         //Find product in database
         const product = await Product.findById(id)
 
         //Check if user is the owner of the product
-        const userId = "5f2e440e61ee703cd9261483"
+        // const userId = "5f2e440e61ee703cd9261483"
 
         if (userId !== product.user.toString()) {
             throw new Error('You are not authorized.')
@@ -54,8 +55,11 @@ const Mutation =  {
 
         return updatedProduct
     },
-    createProduct: async (parent, args, context, info) => {
-        const userId = '5f2e440e61ee703cd9261483'
+    createProduct: async (parent, args, { userId }, info) => {
+        // const userId = '5f2e440e61ee703cd9261483'
+
+        //Check if user logged in
+        if (!userId) throw new Error('Please log in.')
 
         if (!args.description || !args.price || !args.imageUrl) {
             throw new Error('Please provide all required fields.')
@@ -77,13 +81,17 @@ const Mutation =  {
             populate: { path: "products" }
         })
     },
-    addToCart: async (parent, args, context, info) => {
+    addToCart: async (parent, args, {userId}, info) => {
         // id --> productId
         const {id} = args
+
+         //Check if user logged in
+         if (!userId) throw new Error('Please log in.')
+
         try {
             //Find user who perform add to cart --> from logged in
-            const userId = "5f2e6bed711bcd44433a2ec9"
-            
+            // const userId = "5f2e6bed711bcd44433a2ec9"
+
             //check cart
             const user = await User.findById(userId).populate({
                 path: 'carts', 
@@ -132,16 +140,19 @@ const Mutation =  {
             console.log(error)
         }
     },
-    deleteCart: async (parent, args, context, info) => {
+    deleteCart: async (parent, args, {userId}, info) => {
 
         const { id } = args
+
+         //Check if user logged in
+         if (!userId) throw new Error('Please log in.')
 
         //FInd cart from given id
         const cart = await CartItem .findById(id)
 
         //check if user logged in
 
-        const userId = "5f2e6bed711bcd44433a2ec9"
+        // const userId = "5f2e6bed711bcd44433a2ec9"
 
         const user = await User.findById(userId)
 
